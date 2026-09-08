@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Family Menu - Week 1</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f4f4;
+      color: #222;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: #ffffff;
+    }
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: #ffffff;
+      border-bottom: 1px solid #ddd;
+      padding: 22px 20px 16px;
+    }
+    .title {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.1;
+    }
+    .subtitle {
+      margin-top: 6px;
+      font-size: 18px;
+      color: #666;
+    }
+    .content {
+      padding: 18px 18px 28px;
+    }
+    .day-card {
+      border: 2px solid #e1e1e1;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
+      background: #fff;
+      cursor: pointer;
+      min-height: 92px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .day-card:active {
+      transform: scale(0.99);
+    }
+    .day-card.today {
+      border: 4px solid #222;
+      padding: 16px;
+      background: #faf7e8;
+    }
+    .day-left {
+      min-width: 0;
+      padding-right: 16px;
+    }
+    .day-name {
+      font-size: 19px;
+      font-weight: bold;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    .meal-name {
+      font-size: 25px;
+      font-weight: bold;
+      line-height: 1.15;
+    }
+    .today-badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #222;
+      color: white;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+    .arrow {
+      font-size: 34px;
+      color: #777;
+      flex-shrink: 0;
+    }
+    .recipe {
+      display: none;
+    }
+    .back-btn {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 18px;
+      font-size: 22px;
+      font-weight: bold;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      margin-bottom: 18px;
+    }
+    .recipe h2 {
+      margin: 0 0 8px;
+      font-size: 32px;
+      line-height: 1.1;
+    }
+    .meta {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 22px;
+    }
+    .section {
+      background: #f8f8f8;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+    .section h3 {
+      margin: 0 0 12px;
+      font-size: 24px;
+    }
+    ul, ol {
+      margin: 0;
+      padding-left: 26px;
+    }
+    li {
+      font-size: 20px;
+      line-height: 1.45;
+      margin-bottom: 9px;
+    }
+    .footer-note {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin-top: 22px;
+    }
+    @media (max-width: 500px) {
+      .title { font-size: 29px; }
+      .meal-name { font-size: 22px; }
+      .recipe h2 { font-size: 28px; }
+      li { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1 class="title" id="pageTitle">Family Menu</h1>
+      <div class="subtitle" id="pageSubtitle">Week 1 · Serves 4</div>
+    </div>
+
+    <div class="content">
+      <div id="menuView"></div>
+      <div id="recipeView" class="recipe"></div>
+    </div>
+  </div>
+
+  <script>
+    var meals = [
+      {
+        day: "Monday",
+        name: "Garlic & Herb Chicken",
+        time: "About 25 minutes",
+        ingredients: [
+          "600g chicken breast",
+          "750g new potatoes",
+          "1 large broccoli",
+          "Garlic",
+          "Mixed herbs",
+          "Paprika or onion granules (optional)",
+          "A little oil",
+          "Salt and black pepper"
+        ],
+        method: [
+          "Cut the new potatoes in half.",
+          "Toss the potatoes with a little oil, garlic, herbs and seasoning.",
+          "Air fry at 190°C for 20–25 minutes, shaking or turning halfway.",
+          "Season the chicken with garlic, herbs, salt and pepper.",
+          "Fry, air fry or bake the chicken until fully cooked through.",
+          "Steam or boil the broccoli for the last 5–7 minutes.",
+          "Serve everything together."
+        ]
+      },
+      {
+        day: "Tuesday",
+        name: "Beef Stir-Fry & Noodles",
+        time: "About 15 minutes",
+        ingredients: [
+          "500g beef strips",
+          "600g fresh noodles",
+          "320g stir-fry veg",
+          "Mushrooms or broccoli if wanted",
+          "Stir-fry sauce or soy sauce"
+        ],
+        method: [
+          "Heat a large frying pan or wok until very hot.",
+          "Fry the beef for 3–4 minutes, then remove it briefly.",
+          "Cook the vegetables for 4–5 minutes.",
+          "Return the beef to the pan and add the sauce.",
+          "Add the noodles and toss everything together for another 2–3 minutes.",
+          "Serve straight away."
+        ]
+      },
+      {
+        day: "Wednesday",
+        name: "Chicken Curry, Rice & Green Beans",
+        time: "About 25 minutes",
+        ingredients: [
+          "600g chicken breast",
+          "1 jar curry sauce",
+          "1 onion",
+          "A handful of spinach",
+          "Green beans",
+          "300g dry rice"
+        ],
+        method: [
+          "Cook the rice according to the packet instructions.",
+          "Dice the chicken and onion.",
+          "Fry the chicken and onion until the chicken is browned.",
+          "Add the curry sauce and simmer until the chicken is fully cooked.",
+          "Stir in the spinach near the end and let it wilt.",
+          "Steam the green beans separately, or stir them into the curry.",
+          "Serve with the rice."
+        ]
+      },
+      {
+        day: "Thursday",
+        name: "Pork Chops, Mash & Peas",
+        time: "About 25–30 minutes",
+        ingredients: [
+          "4 pork loin steaks or chops",
+          "About 1kg potatoes",
+          "Frozen peas",
+          "A little butter",
+          "A splash of milk",
+          "Salt and black pepper"
+        ],
+        method: [
+          "Peel and chop the potatoes, then boil for 15–20 minutes until soft.",
+          "Season the pork.",
+          "Pan-fry the pork for roughly 5–7 minutes per side, depending on thickness, until fully cooked.",
+          "Cook the peas for the last few minutes.",
+          "Drain and mash the potatoes with a little butter and milk.",
+          "Serve together."
+        ]
+      },
+      {
+        day: "Friday",
+        name: "Creamy Chicken & Mushroom Pasta",
+        time: "About 20 minutes",
+        ingredients: [
+          "500–600g chicken breast",
+          "500g pasta",
+          "Mushrooms",
+          "A handful of spinach",
+          "Reduced-fat crème fraîche",
+          "Garlic",
+          "Mixed herbs"
+        ],
+        method: [
+          "Cook the pasta according to the packet instructions.",
+          "Dice and fry the chicken until it starts to brown.",
+          "Add sliced mushrooms, garlic and herbs.",
+          "Cook until the chicken is fully cooked and the mushrooms are soft.",
+          "Turn the heat down and stir through the crème fraîche.",
+          "Add a splash of pasta water if the sauce needs loosening.",
+          "Add the spinach and let it wilt.",
+          "Drain the pasta and stir it through the sauce."
+        ]
+      },
+      {
+        day: "Saturday",
+        name: "Homemade Burgers & Air-Fryer Wedges",
+        time: "About 25 minutes",
+        ingredients: [
+          "550g beef & pork mince",
+          "4 burger buns",
+          "About 1kg potatoes",
+          "Sweetcorn",
+          "Wedge seasoning",
+          "A little oil",
+          "Cheese (optional)"
+        ],
+        method: [
+          "Cut the potatoes into wedges.",
+          "Toss with a little oil and your wedge seasoning.",
+          "Air fry at 190°C for 20–25 minutes, shaking halfway.",
+          "Divide the mince into 4 equal portions and shape into patties.",
+          "Season the patties and fry for around 4–5 minutes per side until fully cooked.",
+          "Add cheese for the last minute if wanted.",
+          "Warm or toast the buns.",
+          "Serve the burgers with wedges and sweetcorn."
+        ]
+      },
+      {
+        day: "Sunday",
+        name: "Chicken Tray Bake",
+        time: "About 40 minutes",
+        ingredients: [
+          "600g chicken breast",
+          "750g–1kg potatoes",
+          "Carrots",
+          "1 onion",
+          "Broccoli",
+          "Garlic",
+          "Mixed herbs",
+          "A little oil",
+          "Salt and black pepper"
+        ],
+        method: [
+          "Heat the oven to 200°C (180°C fan).",
+          "Chop the potatoes and carrots fairly small and slice the onion.",
+          "Toss the potatoes, carrots and onion with a little oil, garlic, herbs and seasoning.",
+          "Spread on a large baking tray and add the chicken.",
+          "Bake for about 35–40 minutes, until the chicken is fully cooked.",
+          "Add the broccoli for roughly the last 15 minutes.",
+          "Serve straight from the tray."
+        ]
+      }
+    ];
+
+    function getTodayIndex() {
+      var jsDay = new Date().getDay(); // Sun=0
+      return jsDay === 0 ? 6 : jsDay - 1;
+    }
+
+    function renderMenu() {
+      var menu = document.getElementById("menuView");
+      var recipe = document.getElementById("recipeView");
+      var today = getTodayIndex();
+      var html = "";
+
+      for (var i = 0; i < meals.length; i++) {
+        var isToday = i === today;
+        html += '<div class="day-card' + (isToday ? ' today' : '') + '" onclick="openRecipe(' + i + ')">';
+        html += '<div class="day-left">';
+        html += '<div class="day-name">' + meals[i].day + (isToday ? '<span class="today-badge">TODAY</span>' : '') + '</div>';
+        html += '<div class="meal-name">' + meals[i].name + '</div>';
+        html += '</div>';
+        html += '<div class="arrow">›</div>';
+        html += '</div>';
+      }
+
+      menu.innerHTML = html;
+      menu.style.display = "block";
+      recipe.style.display = "none";
+      document.getElementById("pageTitle").innerHTML = "Family Menu";
+      document.getElementById("pageSubtitle").innerHTML = "Week 1 · Serves 4";
+      window.scrollTo(0, 0);
+    }
+
+    function openRecipe(index) {
+      var meal = meals[index];
+      var menu = document.getElementById("menuView");
+      var recipe = document.getElementById("recipeView");
+
+      var html = '<button class="back-btn" onclick="renderMenu()">← Back to Week</button>';
+      html += '<h2>' + meal.day + ' — ' + meal.name + '</h2>';
+      html += '<div class="meta">⏱ ' + meal.time + ' · 👨‍👩‍👧‍👦 Serves 4</div>';
+
+      html += '<div class="section"><h3>Ingredients</h3><ul>';
+      for (var i = 0; i < meal.ingredients.length; i++) {
+        html += '<li>' + meal.ingredients[i] + '</li>';
+      }
+      html += '</ul></div>';
+
+      html += '<div class="section"><h3>Method</h3><ol>';
+      for (var j = 0; j < meal.method.length; j++) {
+        html += '<li>' + meal.method[j] + '</li>';
+      }
+      html += '</ol></div>';
+
+      html += '<button class="back-btn" onclick="renderMenu()">← Back to Week</button>';
+      html += '<div class="footer-note">Family Menu · Week 1</div>';
+
+      recipe.innerHTML = html;
+      menu.style.display = "none";
+      recipe.style.display = "block";
+      document.getElementById("pageTitle").innerHTML = meal.day;
+      document.getElementById("pageSubtitle").innerHTML = meal.name;
+      window.scrollTo(0, 0);
+    }
+
+    renderMenu();
+  </script>
+</body>
+</html>
