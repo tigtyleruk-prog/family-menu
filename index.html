@@ -1,393 +1,51 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Family Menu - Week 1</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f4f4f4;
-      color: #222;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .app {
-      max-width: 760px;
-      margin: 0 auto;
-      min-height: 100vh;
-      background: #ffffff;
-    }
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 5;
-      background: #ffffff;
-      border-bottom: 1px solid #ddd;
-      padding: 22px 20px 16px;
-    }
-    .title {
-      margin: 0;
-      font-size: 34px;
-      line-height: 1.1;
-    }
-    .subtitle {
-      margin-top: 6px;
-      font-size: 18px;
-      color: #666;
-    }
-    .content {
-      padding: 18px 18px 28px;
-    }
-    .day-card {
-      border: 2px solid #e1e1e1;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 14px;
-      background: #fff;
-      cursor: pointer;
-      min-height: 92px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .day-card:active {
-      transform: scale(0.99);
-    }
-    .day-card.today {
-      border: 4px solid #222;
-      padding: 16px;
-      background: #faf7e8;
-    }
-    .day-left {
-      min-width: 0;
-      padding-right: 16px;
-    }
-    .day-name {
-      font-size: 19px;
-      font-weight: bold;
-      color: #666;
-      margin-bottom: 5px;
-    }
-    .meal-name {
-      font-size: 25px;
-      font-weight: bold;
-      line-height: 1.15;
-    }
-    .today-badge {
-      display: inline-block;
-      margin-left: 8px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: #222;
-      color: white;
-      font-size: 13px;
-      vertical-align: middle;
-    }
-    .arrow {
-      font-size: 34px;
-      color: #777;
-      flex-shrink: 0;
-    }
-    .recipe {
-      display: none;
-    }
-    .back-btn {
-      width: 100%;
-      border: none;
-      border-radius: 14px;
-      padding: 18px;
-      font-size: 22px;
-      font-weight: bold;
-      background: #222;
-      color: #fff;
-      cursor: pointer;
-      margin-bottom: 18px;
-    }
-    .recipe h2 {
-      margin: 0 0 8px;
-      font-size: 32px;
-      line-height: 1.1;
-    }
-    .meta {
-      font-size: 18px;
-      color: #666;
-      margin-bottom: 22px;
-    }
-    .section {
-      background: #f8f8f8;
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 18px;
-    }
-    .section h3 {
-      margin: 0 0 12px;
-      font-size: 24px;
-    }
-    ul, ol {
-      margin: 0;
-      padding-left: 26px;
-    }
-    li {
-      font-size: 20px;
-      line-height: 1.45;
-      margin-bottom: 9px;
-    }
-    .footer-note {
-      text-align: center;
-      color: #888;
-      font-size: 14px;
-      margin-top: 22px;
-    }
-    @media (max-width: 500px) {
-      .title { font-size: 29px; }
-      .meal-name { font-size: 22px; }
-      .recipe h2 { font-size: 28px; }
-      li { font-size: 18px; }
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <div class="header">
-      <h1 class="title" id="pageTitle">Family Menu</h1>
-      <div class="subtitle" id="pageSubtitle">Week 1 · Serves 4</div>
-    </div>
-
-    <div class="content">
-      <div id="menuView"></div>
-      <div id="recipeView" class="recipe"></div>
-    </div>
-  </div>
-
-  <script>
-    var meals = [
-      {
-        day: "Monday",
-        name: "Garlic & Herb Chicken",
-        time: "About 25 minutes",
-        ingredients: [
-          "600g chicken breast",
-          "750g new potatoes",
-          "1 large broccoli",
-          "Garlic",
-          "Mixed herbs",
-          "Paprika or onion granules (optional)",
-          "A little oil",
-          "Salt and black pepper"
-        ],
-        method: [
-          "Cut the new potatoes in half.",
-          "Toss the potatoes with a little oil, garlic, herbs and seasoning.",
-          "Air fry at 190°C for 20–25 minutes, shaking or turning halfway.",
-          "Season the chicken with garlic, herbs, salt and pepper.",
-          "Fry, air fry or bake the chicken until fully cooked through.",
-          "Steam or boil the broccoli for the last 5–7 minutes.",
-          "Serve everything together."
-        ]
-      },
-      {
-        day: "Tuesday",
-        name: "Beef Stir-Fry & Noodles",
-        time: "About 15 minutes",
-        ingredients: [
-          "500g beef strips",
-          "600g fresh noodles",
-          "320g stir-fry veg",
-          "Mushrooms or broccoli if wanted",
-          "Stir-fry sauce or soy sauce"
-        ],
-        method: [
-          "Heat a large frying pan or wok until very hot.",
-          "Fry the beef for 3–4 minutes, then remove it briefly.",
-          "Cook the vegetables for 4–5 minutes.",
-          "Return the beef to the pan and add the sauce.",
-          "Add the noodles and toss everything together for another 2–3 minutes.",
-          "Serve straight away."
-        ]
-      },
-      {
-        day: "Wednesday",
-        name: "Chicken Curry, Rice & Green Beans",
-        time: "About 25 minutes",
-        ingredients: [
-          "600g chicken breast",
-          "1 jar curry sauce",
-          "1 onion",
-          "A handful of spinach",
-          "Green beans",
-          "300g dry rice"
-        ],
-        method: [
-          "Cook the rice according to the packet instructions.",
-          "Dice the chicken and onion.",
-          "Fry the chicken and onion until the chicken is browned.",
-          "Add the curry sauce and simmer until the chicken is fully cooked.",
-          "Stir in the spinach near the end and let it wilt.",
-          "Steam the green beans separately, or stir them into the curry.",
-          "Serve with the rice."
-        ]
-      },
-      {
-        day: "Thursday",
-        name: "Pork Chops, Mash & Peas",
-        time: "About 25–30 minutes",
-        ingredients: [
-          "4 pork loin steaks or chops",
-          "About 1kg potatoes",
-          "Frozen peas",
-          "A little butter",
-          "A splash of milk",
-          "Salt and black pepper"
-        ],
-        method: [
-          "Peel and chop the potatoes, then boil for 15–20 minutes until soft.",
-          "Season the pork.",
-          "Pan-fry the pork for roughly 5–7 minutes per side, depending on thickness, until fully cooked.",
-          "Cook the peas for the last few minutes.",
-          "Drain and mash the potatoes with a little butter and milk.",
-          "Serve together."
-        ]
-      },
-      {
-        day: "Friday",
-        name: "Creamy Chicken & Mushroom Pasta",
-        time: "About 20 minutes",
-        ingredients: [
-          "500–600g chicken breast",
-          "500g pasta",
-          "Mushrooms",
-          "A handful of spinach",
-          "Reduced-fat crème fraîche",
-          "Garlic",
-          "Mixed herbs"
-        ],
-        method: [
-          "Cook the pasta according to the packet instructions.",
-          "Dice and fry the chicken until it starts to brown.",
-          "Add sliced mushrooms, garlic and herbs.",
-          "Cook until the chicken is fully cooked and the mushrooms are soft.",
-          "Turn the heat down and stir through the crème fraîche.",
-          "Add a splash of pasta water if the sauce needs loosening.",
-          "Add the spinach and let it wilt.",
-          "Drain the pasta and stir it through the sauce."
-        ]
-      },
-      {
-        day: "Saturday",
-        name: "Homemade Burgers & Air-Fryer Wedges",
-        time: "About 25 minutes",
-        ingredients: [
-          "550g beef & pork mince",
-          "4 burger buns",
-          "About 1kg potatoes",
-          "Sweetcorn",
-          "Wedge seasoning",
-          "A little oil",
-          "Cheese (optional)"
-        ],
-        method: [
-          "Cut the potatoes into wedges.",
-          "Toss with a little oil and your wedge seasoning.",
-          "Air fry at 190°C for 20–25 minutes, shaking halfway.",
-          "Divide the mince into 4 equal portions and shape into patties.",
-          "Season the patties and fry for around 4–5 minutes per side until fully cooked.",
-          "Add cheese for the last minute if wanted.",
-          "Warm or toast the buns.",
-          "Serve the burgers with wedges and sweetcorn."
-        ]
-      },
-      {
-        day: "Sunday",
-        name: "Chicken Tray Bake",
-        time: "About 40 minutes",
-        ingredients: [
-          "600g chicken breast",
-          "750g–1kg potatoes",
-          "Carrots",
-          "1 onion",
-          "Broccoli",
-          "Garlic",
-          "Mixed herbs",
-          "A little oil",
-          "Salt and black pepper"
-        ],
-        method: [
-          "Heat the oven to 200°C (180°C fan).",
-          "Chop the potatoes and carrots fairly small and slice the onion.",
-          "Toss the potatoes, carrots and onion with a little oil, garlic, herbs and seasoning.",
-          "Spread on a large baking tray and add the chicken.",
-          "Bake for about 35–40 minutes, until the chicken is fully cooked.",
-          "Add the broccoli for roughly the last 15 minutes.",
-          "Serve straight from the tray."
-        ]
-      }
-    ];
-
-    function getTodayIndex() {
-      var jsDay = new Date().getDay(); // Sun=0
-      return jsDay === 0 ? 6 : jsDay - 1;
-    }
-
-    function renderMenu() {
-      var menu = document.getElementById("menuView");
-      var recipe = document.getElementById("recipeView");
-      var today = getTodayIndex();
-      var html = "";
-
-      for (var i = 0; i < meals.length; i++) {
-        var isToday = i === today;
-        html += '<div class="day-card' + (isToday ? ' today' : '') + '" onclick="openRecipe(' + i + ')">';
-        html += '<div class="day-left">';
-        html += '<div class="day-name">' + meals[i].day + (isToday ? '<span class="today-badge">TODAY</span>' : '') + '</div>';
-        html += '<div class="meal-name">' + meals[i].name + '</div>';
-        html += '</div>';
-        html += '<div class="arrow">›</div>';
-        html += '</div>';
-      }
-
-      menu.innerHTML = html;
-      menu.style.display = "block";
-      recipe.style.display = "none";
-      document.getElementById("pageTitle").innerHTML = "Family Menu";
-      document.getElementById("pageSubtitle").innerHTML = "Week 1 · Serves 4";
-      window.scrollTo(0, 0);
-    }
-
-    function openRecipe(index) {
-      var meal = meals[index];
-      var menu = document.getElementById("menuView");
-      var recipe = document.getElementById("recipeView");
-
-      var html = '<button class="back-btn" onclick="renderMenu()">← Back to Week</button>';
-      html += '<h2>' + meal.day + ' — ' + meal.name + '</h2>';
-      html += '<div class="meta">⏱ ' + meal.time + ' · 👨‍👩‍👧‍👦 Serves 4</div>';
-
-      html += '<div class="section"><h3>Ingredients</h3><ul>';
-      for (var i = 0; i < meal.ingredients.length; i++) {
-        html += '<li>' + meal.ingredients[i] + '</li>';
-      }
-      html += '</ul></div>';
-
-      html += '<div class="section"><h3>Method</h3><ol>';
-      for (var j = 0; j < meal.method.length; j++) {
-        html += '<li>' + meal.method[j] + '</li>';
-      }
-      html += '</ol></div>';
-
-      html += '<button class="back-btn" onclick="renderMenu()">← Back to Week</button>';
-      html += '<div class="footer-note">Family Menu · Week 1</div>';
-
-      recipe.innerHTML = html;
-      menu.style.display = "none";
-      recipe.style.display = "block";
-      document.getElementById("pageTitle").innerHTML = meal.day;
-      document.getElementById("pageSubtitle").innerHTML = meal.name;
-      window.scrollTo(0, 0);
-    }
-
-    renderMenu();
-  </script>
-</body>
-</html>
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Family Menu</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f3f3f3;color:#222}button{font:inherit}
+.app{max-width:760px;margin:auto;min-height:100vh;background:#fff}header{position:sticky;top:0;background:#fff;border-bottom:1px solid #ddd;padding:18px;z-index:5}
+h1{margin:0;font-size:32px}.sub{color:#666;margin-top:5px}nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:14px}
+.tab,.btn{border:0;border-radius:11px;padding:12px;font-weight:700;min-height:46px;cursor:pointer}.tab{background:#eee}.tab.on,.btn{background:#222;color:#fff}
+main{padding:16px}.card{border:2px solid #e3e3e3;border-radius:15px;padding:16px;margin-bottom:12px}.today{border:4px solid #222;background:#faf7e8}
+.day{font-weight:700;color:#666}.meal{font-size:23px;font-weight:700;margin-top:4px}.badge{font-size:12px;background:#222;color:#fff;border-radius:999px;padding:3px 8px;margin-left:6px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.secondary{background:#eee;color:#222;border:1px solid #ccc}.danger{background:#f4f4f4;color:#8c1d1d;border:1px solid #ddd}
+.note{background:#f8f6e9;border:1px solid #e8e2bd;border-radius:13px;padding:13px;margin-bottom:14px}.empty{color:#777;font-style:italic}
+#recipe{display:none}section{background:#f7f7f7;border-radius:14px;padding:16px;margin-bottom:16px}li{font-size:19px;line-height:1.4;margin-bottom:8px}
+.overlay{display:none;position:fixed;inset:0;background:#0008;z-index:10;padding:20px;overflow:auto}.picker{max-width:600px;margin:30px auto;background:white;border-radius:16px;padding:18px}
+.pick{width:100%;text-align:left;border:1px solid #ddd;background:#f7f7f7;border-radius:11px;padding:14px;margin-bottom:8px;font-weight:700}
+@media(max-width:520px){nav{grid-template-columns:repeat(2,1fr)}h1{font-size:28px}.meal{font-size:21px}}
+</style></head>
+<body><div class="app"><header><h1>Family Menu</h1><div class="sub">Family meal planner · Serves 4</div>
+<nav><button class="tab on" data-v="current">This Week</button><button class="tab" data-v="next">Next Week</button><button class="tab" data-v="library">All Meals</button><button class="tab" data-v="history">Previous</button></nav>
+</header><main><div id="view"></div><div id="recipe"></div></main></div>
+<div class="overlay" id="overlay"><div class="picker"><h2 id="pickTitle"></h2><div id="pickDays"></div><button class="btn secondary" style="width:100%" onclick="closePicker()">Cancel</button></div></div>
+<script>
+const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const MEALS=[{"id": "garlic-chicken", "name": "Garlic & Herb Chicken", "time": "About 25 minutes", "ingredients": ["600g chicken breast", "750g new potatoes", "1 large broccoli", "Garlic", "Mixed herbs", "Paprika or onion granules (optional)", "A little oil", "Salt and black pepper"], "method": ["Cut the new potatoes in half.", "Toss with oil, garlic, herbs and seasoning.", "Air fry at 190°C for 20–25 minutes.", "Season and cook the chicken through.", "Steam or boil broccoli for 5–7 minutes.", "Serve together."]}, {"id": "beef-stir-fry", "name": "Beef Stir-Fry & Noodles", "time": "About 15 minutes", "ingredients": ["500g beef strips", "600g fresh noodles", "320g stir-fry veg", "Mushrooms or broccoli if wanted", "Stir-fry sauce or soy sauce"], "method": ["Fry beef for 3–4 minutes and remove.", "Cook veg for 4–5 minutes.", "Return beef and add sauce.", "Add noodles and toss for 2–3 minutes.", "Serve."]}, {"id": "chicken-curry", "name": "Chicken Curry, Rice & Green Beans", "time": "About 25 minutes", "ingredients": ["600g chicken breast", "1 jar curry sauce", "1 onion", "A handful of spinach", "Green beans", "300g dry rice"], "method": ["Cook rice.", "Fry diced chicken and onion.", "Add curry sauce and simmer until cooked.", "Wilt in spinach.", "Cook green beans.", "Serve with rice."]}, {"id": "pork-mash", "name": "Pork Chops, Mash & Peas", "time": "About 25–30 minutes", "ingredients": ["4 pork loin steaks or chops", "About 1kg potatoes", "Frozen peas", "A little butter", "A splash of milk", "Salt and black pepper"], "method": ["Boil potatoes 15–20 minutes.", "Season and pan-fry pork until cooked through.", "Cook peas.", "Mash potatoes with butter and milk.", "Serve."]}, {"id": "creamy-pasta", "name": "Creamy Chicken & Mushroom Pasta", "time": "About 20 minutes", "ingredients": ["500–600g chicken breast", "500g pasta", "Mushrooms", "A handful of spinach", "Reduced-fat crème fraîche", "Garlic", "Mixed herbs"], "method": ["Cook pasta.", "Fry chicken.", "Add mushrooms, garlic and herbs.", "Stir through crème fraîche.", "Wilt in spinach.", "Mix through pasta."]}, {"id": "burgers", "name": "Homemade Burgers & Air-Fryer Wedges", "time": "About 25 minutes", "ingredients": ["550g beef & pork mince", "4 burger buns", "About 1kg potatoes", "Sweetcorn", "Wedge seasoning", "A little oil", "Cheese (optional)"], "method": ["Cut potatoes into wedges and season.", "Air fry at 190°C for 20–25 minutes.", "Shape mince into 4 patties.", "Cook burgers through.", "Add cheese if wanted.", "Serve with wedges and sweetcorn."]}, {"id": "tray-bake", "name": "Chicken Tray Bake", "time": "About 40 minutes", "ingredients": ["600g chicken breast", "750g–1kg potatoes", "Carrots", "1 onion", "Broccoli", "Garlic", "Mixed herbs", "A little oil", "Salt and black pepper"], "method": ["Heat oven to 200°C / 180°C fan.", "Chop potatoes, carrots and onion.", "Season and add to tray with chicken.", "Bake 35–40 minutes.", "Add broccoli for last 15 minutes.", "Serve."]}];
+const DEFAULT=MEALS.map(m=>m.id);
+let state={current:[...DEFAULT],next:[null,null,null,null,null,null,null],favorites:[],dislikes:[],history:[]},view="current",storageOK=true;
+try{let s=localStorage.getItem("familyMenuV2");if(s)state=JSON.parse(s)}catch(e){storageOK=false}
+const save=()=>{if(storageOK)try{localStorage.setItem("familyMenuV2",JSON.stringify(state))}catch(e){storageOK=false}};
+const meal=id=>MEALS.find(m=>m.id===id);
+const today=()=>{let d=new Date().getDay();return d===0?6:d-1};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function show(v){view=v;document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.v===v));document.getElementById("recipe").style.display="none";document.getElementById("view").style.display="block";render();scrollTo(0,0)}
+function weekCards(arr,hi=false){return arr.map((id,i)=>{let m=meal(id);return `<div class="card ${hi&&i===today()?"today":""}"><div class="day">${DAYS[i]}${hi&&i===today()?'<span class="badge">TODAY</span>':""}</div><div class="meal">${m?esc(m.name):'<span class="empty">No meal selected</span>'}</div>${m?`<div class="actions"><button class="btn" onclick="openRecipe('${m.id}')">View recipe</button></div>`:""}</div>`}).join("")}
+function nextView(){let h='<div class="note">Choose meals for next week here or from <b>All Meals</b>.</div><div class="actions" style="margin-bottom:14px"><button class="btn danger" onclick="clearNext()">Clear next week</button><button class="btn" onclick="promote()" '+(state.next.includes(null)?"disabled":"")+'>Make Next Week Current</button></div>';state.next.forEach((id,i)=>{let m=meal(id);h+=`<div class="card"><div class="day">${DAYS[i]}</div><div class="meal">${m?esc(m.name):'<span class="empty">Choose a meal</span>'}</div><div class="actions">${m?`<button class="btn" onclick="openRecipe('${m.id}')">Recipe</button><button class="btn secondary" onclick="chooseForDay(${i})">Change</button><button class="btn danger" onclick="removeNext(${i})">Remove</button>`:`<button class="btn" onclick="chooseForDay(${i})">Choose meal</button>`}</div></div>`});return h}
+function libraryView(){return '<div class="note">Favourite the winners, mark dislikes, or add a meal straight into next week.</div>'+MEALS.map(m=>{let f=state.favorites.includes(m.id),d=state.dislikes.includes(m.id);return `<div class="card"><div class="meal">${esc(m.name)}</div><div class="sub">${esc(m.time)}</div><div class="actions"><button class="btn" onclick="openRecipe('${m.id}')">Recipe</button><button class="btn secondary" onclick="pickDay('${m.id}')">Add to next week</button><button class="btn secondary" onclick="fav('${m.id}')">${f?"★ Unfavourite":"☆ Favourite"}</button><button class="btn secondary" onclick="dislike('${m.id}')">${d?"Undo dislike":"👎 Not again"}</button></div></div>`}).join("")}
+function historyView(){if(!state.history.length)return '<div class="note">No previous weeks yet. When you make Next Week current, the old week is saved here automatically.</div>';return [...state.history].reverse().map(x=>`<div class="card"><div class="meal">${esc(x.label)}</div><div class="sub">Saved ${esc(x.saved)}</div>${x.week.map((id,i)=>`<div style="padding:7px 0;border-top:1px solid #eee"><b>${DAYS[i]}:</b> ${meal(id)?esc(meal(id).name):"—"}</div>`).join("")}</div>`).join("")}
+function render(){document.getElementById("view").innerHTML=(storageOK?"":'<div class="note">This browser is not allowing saved local data, so changes may not persist.</div>')+(view==="current"?weekCards(state.current,true):view==="next"?nextView():view==="library"?libraryView():historyView())}
+function openRecipe(id){let m=meal(id),r=document.getElementById("recipe");r.innerHTML=`<button class="btn" style="width:100%;margin-bottom:16px" onclick="closeRecipe()">← Back</button><h2>${esc(m.name)}</h2><div class="sub">${esc(m.time)} · Serves 4</div><section><h3>Ingredients</h3><ul>${m.ingredients.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></section><section><h3>Method</h3><ol>${m.method.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></section><button class="btn" style="width:100%" onclick="closeRecipe()">← Back</button>`;document.getElementById("view").style.display="none";r.style.display="block";scrollTo(0,0)}
+function closeRecipe(){document.getElementById("recipe").style.display="none";document.getElementById("view").style.display="block";scrollTo(0,0)}
+function fav(id){state.favorites=state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[...state.favorites.filter(x=>x!==id),id];state.dislikes=state.dislikes.filter(x=>x!==id);save();render()}
+function dislike(id){state.dislikes=state.dislikes.includes(id)?state.dislikes.filter(x=>x!==id):[...state.dislikes.filter(x=>x!==id),id];state.favorites=state.favorites.filter(x=>x!==id);save();render()}
+function openPicker(title,buttons){document.getElementById("pickTitle").textContent=title;document.getElementById("pickDays").innerHTML=buttons;document.getElementById("overlay").style.display="block"}
+function closePicker(){document.getElementById("overlay").style.display="none"}
+function pickDay(id){openPicker("Add “"+meal(id).name+"”",DAYS.map((d,i)=>`<button class="pick" onclick="assign(${i},'${id}')">${d}${state.next[i]?" — "+esc(meal(state.next[i]).name):" — empty"}</button>`).join(""))}
+function chooseForDay(i){openPicker("Choose for "+DAYS[i],MEALS.map(m=>`<button class="pick" onclick="assign(${i},'${m.id}')">${esc(m.name)}</button>`).join(""))}
+function assign(i,id){state.next[i]=id;save();closePicker();show("next")}
+function removeNext(i){state.next[i]=null;save();render()}
+function clearNext(){if(confirm("Clear every meal from next week?")){state.next=[null,null,null,null,null,null,null];save();render()}}
+function promote(){if(state.next.includes(null))return;state.history.push({label:"Previous Week "+(state.history.length+1),saved:new Date().toLocaleDateString(),week:[...state.current]});state.current=[...state.next];state.next=[null,null,null,null,null,null,null];save();show("current")}
+document.querySelector("nav").addEventListener("click",e=>{if(e.target.dataset.v)show(e.target.dataset.v)});document.getElementById("overlay").addEventListener("click",e=>{if(e.target.id==="overlay")closePicker()});render();
+</script></body></html>
