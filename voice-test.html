@@ -3,45 +3,187 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Fridge Voice Test</title>
+<title>Fridge Voice Control Test</title>
 <style>
   *{box-sizing:border-box}
   body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f3f3f3;color:#222}
-  .wrap{max-width:760px;margin:0 auto;min-height:100vh;background:#fff;padding:28px 20px;display:flex;flex-direction:column;justify-content:center}
-  h1{font-size:38px;margin:0 0 12px;text-align:center}
-  p{font-size:20px;line-height:1.4;text-align:center;color:#666;margin:0 0 28px}
-  button{width:100%;min-height:110px;border:0;border-radius:18px;font-size:30px;font-weight:700;background:#222;color:#fff;cursor:pointer;padding:20px}
-  button:active{transform:scale(.99)}
-  #status{margin-top:18px;text-align:center;font-size:18px;color:#555;min-height:26px}
+  .wrap{max-width:760px;margin:0 auto;min-height:100vh;background:#fff;padding:26px 20px}
+  h1{font-size:36px;margin:0 0 10px;text-align:center}
+  p{font-size:19px;line-height:1.45;text-align:center;color:#666}
+  .status{margin:18px 0;padding:18px;border-radius:16px;background:#f7f7f7;border:2px solid #ddd;text-align:center}
+  .big{font-size:26px;font-weight:700;margin-bottom:8px}
+  .heard{font-size:20px;color:#555;min-height:30px}
+  .buttons{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+  button{min-height:86px;border:0;border-radius:16px;font-size:24px;font-weight:700;cursor:pointer;padding:14px}
+  .listen{background:#222;color:#fff}
+  .secondary{background:#ececec;color:#222}
+  .step{margin-top:22px;border:3px solid #222;border-radius:18px;padding:22px;text-align:center}
+  .stepnum{font-size:18px;color:#666}
+  .steptext{font-size:30px;font-weight:700;margin-top:8px;line-height:1.25}
+  .commands{margin-top:22px;background:#faf7e8;border-radius:16px;padding:18px}
+  .commands h2{margin:0 0 10px;font-size:24px}
+  .commands ul{margin:0;padding-left:24px}
+  .commands li{font-size:19px;line-height:1.5;margin-bottom:5px}
+  #support{font-size:16px;color:#666;margin-top:12px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Fridge Voice Test</h1>
-  <p>Tap the button below. If the fridge browser supports speech synthesis, it should speak out loud.</p>
-  <button id="speakBtn">🔊 Speak</button>
-  <div id="status"></div>
+  <h1>Fridge Voice Control Test</h1>
+  <p>Tap <b>Start Listening</b>, allow microphone access if asked, then try saying “next step” or “back a step”.</p>
+
+  <div class="status">
+    <div class="big" id="listenStatus">Not listening</div>
+    <div class="heard" id="heard">Waiting for a command…</div>
+    <div id="support"></div>
+  </div>
+
+  <div class="buttons">
+    <button class="listen" id="listenBtn">🎤 Start Listening</button>
+    <button class="secondary" id="speakBtn">🔊 Test Speaker</button>
+  </div>
+
+  <div class="step">
+    <div class="stepnum" id="stepNum">Step 1 of 4</div>
+    <div class="steptext" id="stepText">Chop the chicken into bite-sized pieces.</div>
+  </div>
+
+  <div class="commands">
+    <h2>Try saying</h2>
+    <ul>
+      <li>“Next step”</li>
+      <li>“Back a step”</li>
+      <li>“Previous step”</li>
+      <li>“Repeat step”</li>
+      <li>“Start again”</li>
+    </ul>
+  </div>
 </div>
+
 <script>
 (function(){
-  var btn=document.getElementById("speakBtn");
-  var status=document.getElementById("status");
-  function speak(){
+  var steps=[
+    "Chop the chicken into bite-sized pieces.",
+    "Heat a little oil in a frying pan.",
+    "Cook the chicken until browned and cooked through.",
+    "Serve with the vegetables and enjoy."
+  ];
+  var index=0;
+  var listening=false;
+  var recognition=null;
+
+  var listenBtn=document.getElementById("listenBtn");
+  var speakBtn=document.getElementById("speakBtn");
+  var listenStatus=document.getElementById("listenStatus");
+  var heard=document.getElementById("heard");
+  var support=document.getElementById("support");
+  var stepNum=document.getElementById("stepNum");
+  var stepText=document.getElementById("stepText");
+
+  function render(){
+    stepNum.textContent="Step "+(index+1)+" of "+steps.length;
+    stepText.textContent=steps[index];
+  }
+
+  function speak(text){
     if(!("speechSynthesis" in window)){
-      status.textContent="Speech synthesis is not supported in this browser.";
+      support.textContent="Speaker test unavailable: speech synthesis is not supported.";
       return;
     }
     window.speechSynthesis.cancel();
-    var utter=new SpeechSynthesisUtterance("Are you impressed yet, Jake?");
-    utter.lang="en-GB";
-    utter.rate=0.95;
-    utter.pitch=1.0;
-    utter.onstart=function(){status.textContent="Speaking…";};
-    utter.onend=function(){status.textContent="Done.";};
-    utter.onerror=function(){status.textContent="Speech failed in this browser.";};
-    window.speechSynthesis.speak(utter);
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang="en-GB";
+    u.rate=0.95;
+    window.speechSynthesis.speak(u);
   }
-  btn.addEventListener("click",speak);
+
+  function handleCommand(raw){
+    var text=raw.toLowerCase().trim();
+    heard.textContent='Heard: “'+raw+'”';
+
+    if(text.includes("next")){
+      if(index<steps.length-1) index++;
+      render();
+      speak(steps[index]);
+      return;
+    }
+
+    if(text.includes("back") || text.includes("previous")){
+      if(index>0) index--;
+      render();
+      speak(steps[index]);
+      return;
+    }
+
+    if(text.includes("repeat")){
+      speak(steps[index]);
+      return;
+    }
+
+    if(text.includes("start again") || text.includes("first step")){
+      index=0;
+      render();
+      speak(steps[index]);
+      return;
+    }
+
+    heard.textContent='Heard: “'+raw+'” — command not recognised';
+  }
+
+  var SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+
+  if(!SpeechRecognition){
+    support.textContent="Voice recognition is not supported in this browser.";
+    listenBtn.disabled=true;
+    listenBtn.style.opacity=".45";
+  }else{
+    support.textContent="Voice recognition API detected.";
+    recognition=new SpeechRecognition();
+    recognition.lang="en-GB";
+    recognition.continuous=true;
+    recognition.interimResults=false;
+
+    recognition.onstart=function(){
+      listening=true;
+      listenStatus.textContent="Listening…";
+      listenBtn.textContent="⏹ Stop Listening";
+    };
+
+    recognition.onend=function(){
+      listening=false;
+      listenStatus.textContent="Not listening";
+      listenBtn.textContent="🎤 Start Listening";
+    };
+
+    recognition.onerror=function(e){
+      listenStatus.textContent="Voice error";
+      heard.textContent="Error: "+e.error;
+    };
+
+    recognition.onresult=function(event){
+      for(var i=event.resultIndex;i<event.results.length;i++){
+        if(event.results[i].isFinal){
+          handleCommand(event.results[i][0].transcript);
+        }
+      }
+    };
+  }
+
+  listenBtn.addEventListener("click",function(){
+    if(!recognition) return;
+    if(listening){
+      recognition.stop();
+    }else{
+      heard.textContent="Waiting for a command…";
+      try{ recognition.start(); }catch(e){}
+    }
+  });
+
+  speakBtn.addEventListener("click",function(){
+    speak("Are you impressed yet, Jake?");
+  });
+
+  render();
 })();
 </script>
 </body>
